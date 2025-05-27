@@ -38,6 +38,7 @@ class Loop{
 
         this.interactables.forEach(obj => {
             if (obj.userData.falling) {
+                // works because the floor and the objects are all gas (physics based animation)
                 const dt = 1 / 60;
                 obj.userData.velocity += obj.userData.acceleration * dt;
                 obj.position.y += obj.userData.velocity * dt;

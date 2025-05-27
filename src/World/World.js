@@ -101,7 +101,7 @@ class World{
             if (intersects.length > 0) {
                 const obj = intersects[0].object;
                 console.log(obj.name);
-                if (obj.name.indexOf('Frame') > -1 && !obj.userData.falling) { // the frame is the edge of the paintings (the brown)
+                if (obj.name.indexOf('Frame') > -1 && !obj.userData.falling) { // the frames (made of gas, so they pass through each other!!) is the edge of the paintings (the brown)
                     console.log("ahhhh")
                     obj.userData.falling = true;
                     obj.userData.velocity = 0;
