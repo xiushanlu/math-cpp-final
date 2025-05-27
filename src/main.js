@@ -26,3 +26,27 @@ async function main(){
 main().catch((err) => {
     console.error(err);
 });
+
+const words = [' developer', 'n artist', ' designer'];
+const identitiesElem = document.getElementById('identities');
+let wordIndex = 0;
+let charIndex = 0;
+
+function type() {
+    const word = words[wordIndex];
+    if (charIndex <= word.length) {
+        identitiesElem.innerHTML = `I'm a${word.slice(0, charIndex)}`;
+        charIndex++;
+        setTimeout(type, 60); 
+    } else {
+        setTimeout(() => {
+            charIndex = 0;
+            wordIndex = (wordIndex + 1) % words.length;
+            type();
+        }, 1200); 
+    }
+}
+
+if (identitiesElem) {
+    type();
+}

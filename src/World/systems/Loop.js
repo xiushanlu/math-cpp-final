@@ -3,11 +3,12 @@ import { Clock } from 'https://cdn.skypack.dev/three@0.132.2/build/three.module.
 const clock = new Clock();
 
 class Loop{
-    constructor(camera, scene, renderer){
+    constructor(camera, scene, renderer, interactables){
         this.camera = camera;
         this.scene = scene;
         this.renderer = renderer;
         this.updatables = [];
+        this.interactables = interactables; // store reference
     }
 
     start(){
@@ -34,6 +35,27 @@ class Loop{
         for(const object of this.updatables) {
             object.tick(delta);
         }
+
+        this.interactables.forEach(obj => {
+            if (obj.userData.falling) {
+                const dt = 1 / 60;
+                obj.userData.velocity += obj.userData.acceleration * dt;
+                obj.position.y += obj.userData.velocity * dt;
+
+                // DOESNT WORK BECAUSE I APPLIED ALL TRANSFORMATIONS BEFORE EXPORTING. NOW EVERYTHING IS AT 0,0,0
+                /* 
+                if (obj.position.y <= 0.01) {
+                    obj.position.y = 0.01;
+                    obj.userData.falling = false;
+                    obj.userData.velocity = 0;
+
+                    // Play clunk sound
+                    const audio = new Audio('/assets/sounds/clunk.mp3');
+                    audio.play();
+                }
+                */
+            }
+        });
     }
 }
 

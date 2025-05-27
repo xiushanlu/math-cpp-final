@@ -18,7 +18,6 @@ import { Loop } from './systems/Loop.js';
 // These variables are module-scoped: we cannot access them from outside the module
 // NOTE: This will not work if there are multiple instances of the World class (they will be overwritten)
 let camera, renderer, scene, loop, controls, src;
-let interactables = [];
 
 class World{
     // Create an instance of the World app
@@ -26,7 +25,8 @@ class World{
         this.camera = createCamera();
         this.scene = createScene();
         this.renderer = createRenderer();
-        this.loop = new Loop(this.camera, this.scene, this.renderer);
+        this.interactables = [];
+        this.loop = new Loop(this.camera, this.scene, this.renderer, this.interactables);
         container.append(this.renderer.domElement);
         this.src = source;
 
@@ -36,27 +36,6 @@ class World{
         const resizer = new Resizer(container, this.camera, this.renderer);
 
         this.scene.add(ambientLight, light);
-
-        // Add mousemove event listener
-        this.renderer.domElement.addEventListener('mousemove', (event) => {
-            const rect = this.renderer.domElement.getBoundingClientRect();
-            const mouse = new THREE.Vector2(
-                ((event.clientX - rect.left) / rect.width) * 2 - 1,
-                -((event.clientY - rect.top) / rect.height) * 2 + 1
-            );
-
-            const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(mouse, this.camera);
-
-            // Raycast against all interactable meshes
-            const intersects = raycaster.intersectObjects(interactables, true);
-
-            if (intersects.length > 0) {
-                const point = intersects[0].point;
-                // Restrict y to a fixed value (e.g., y = 1)
-                this.light.position.set(point.x, point.y, 1);
-            }
-        });
     }
 
     async init(){
@@ -77,14 +56,77 @@ class World{
             child.receiveShadow = true;
 
             // Example: set userData for clicks
-            if (child.name === 'ClickableCatCanvas') {
+            if (child.name.includes('Frame')) {
                 child.userData.onClick = () => {
-                console.log('Cat canvas clicked!');
+                console.log('Frame clicked!');
                 };
             }
 
             // Or just add all clickable meshes to an array:
-            interactables.push(child);
+            this.interactables.push(child);
+            }
+        });
+
+        // Add event listeners here, after interactables is filled
+        this.renderer.domElement.addEventListener('mousemove', (event) => {
+            const rect = this.renderer.domElement.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                -((event.clientY - rect.top) / rect.height) * 2 + 1
+            );
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, this.camera);
+
+            const intersects = raycaster.intersectObjects(this.interactables, true);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                this.light.position.set(point.x, point.y, 1);
+            }
+        });
+
+        this.renderer.domElement.addEventListener('click', (event) => {
+            const rect = this.renderer.domElement.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                -((event.clientY - rect.top) / rect.height) * 2 + 1
+            );
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, this.camera);
+
+            const intersects = raycaster.intersectObjects(this.interactables, true);
+
+            if (intersects.length > 0) {
+                const obj = intersects[0].object;
+                console.log(obj.name);
+                if (obj.name.indexOf('Frame') > -1 && !obj.userData.falling) { // the frame is the edge of the paintings (the brown)
+                    console.log("ahhhh")
+                    obj.userData.falling = true;
+                    obj.userData.velocity = 0;
+                    obj.userData.acceleration = -9.8;
+                    const audio = new Audio('/assets/sounds/clunk.mp3');
+                    audio.play();
+                }
+            }
+        });
+
+        document.getElementById('contact').addEventListener('mousemove', (event) => {
+            const rect = this.renderer.domElement.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((event.clientX - rect.left) / rect.width) * 2 - 1,
+                -((event.clientY - rect.top) / rect.height) * 2 + 1
+            );
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, this.camera);
+
+            const intersects = raycaster.intersectObjects(this.interactables, true);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                this.light.position.set(point.x, point.y, 1);
             }
         });
     }
