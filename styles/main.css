@@ -1,0 +1,31 @@
+* {
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+html {
+  scroll-behavior: smooth;
+}
+nav, nav div {
+    position: sticky;
+    display: flex;
+    background-color: black;
+    width: 100%;
+    justify-content: space-between;
+    top: 0;
+    z-index: 999;
+}
+nav div a {
+    text-decoration: none;
+    color: white;
+}
+canvas, #home, #portfolio, #contact {
+    height: 65vw !important;
+    width: 100vw !important;
+}
+h1, p {
+  position: absolute;
+  z-index: 1;
+  color: white;
+  text-align: center;
+}
