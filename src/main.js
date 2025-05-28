@@ -47,6 +47,26 @@ function type() {
     }
 }
 
+function setupSendButton(buttonId) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+
+    // Check localStorage
+    if (localStorage.getItem('contactSent') === 'true') {
+        btn.disabled = true;
+        btn.textContent = 'Sent!';
+        btn.style.backgroundColor = 'grey';
+    }
+
+    btn.addEventListener('click', function () {
+        localStorage.setItem('contactSent', 'true');
+        btn.disabled = true;
+        btn.textContent = 'Sent!';
+    });
+}
+
+
 if (identitiesElem) {
     type();
+    setupSendButton('sendBtn');
 }
